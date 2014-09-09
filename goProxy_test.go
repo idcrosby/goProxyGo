@@ -7,8 +7,8 @@ import(
 func TestGet(t *testing.T) {
 	url := "http://example.com"
 	data := "..."
-	if x := GoGet(url); len(x) == 0 {
-		t.Errorf("Get(" + url + ") = " + x + ", want " + data)
+	if x := GoGet(url); x == nil {
+		t.Errorf("Get(" + url + ") = " + string(x) + ", want " + data)
 	}	
 }
 
