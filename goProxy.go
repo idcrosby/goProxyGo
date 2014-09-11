@@ -1,21 +1,34 @@
 package goProxy
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"github.com/idcrosby/web-tools"
 	"net/http"
+	"net/url"
 	"strings"
 )
 
 func GoGet(url string) ([]byte, error) {
 	res, err := http.Get(url)
 	// check(err)
-
+	defer res.Body.Close()
 	body, err := ioutil.ReadAll(res.Body)
 	// check(err)
 	return body, err
+}
+
+func BuildRequest(url *url.URL, method string, body []byte, headers http.Header) *http.Request {
+	req, err := http.NewRequest(method, url.String(), bytes.NewReader(body))
+	check(err)
+	req.Header = headers
+	return req
+}
+
+func ExecuteRequest(request *http.Request) (resp *http.Response, err error) {
+	return http.DefaultClient.Do(request)
 }
 
 func GoGetAndFilter(url string, filter []string, pretty bool) []byte {
