@@ -1,6 +1,7 @@
 package goProxy
 
 import(
+	"net/http"
 	"testing"
 )
 
@@ -29,6 +30,13 @@ func TestHateoasExpand(t *testing.T) {
 	if x, err := HateoasExpand(input, expand); string(x) != data  || err != nil {
 		t.Errorf("HateoasExpand(" + string(input) + ", " + arrayToString(expand) + ") = " + string(x) + ", want " + data)
 	}	
+}
+
+func TestAssault(t *testing.T) {
+	req, _ := http.NewRequest("GET",  "http://api.icndb.com/jokes/15", nil)
+	if !Assault(req, 5, 5) {
+		t.Errorf("Assault(http://api.icndb.com/jokes/15, 5, 5) = false")
+	}
 }
 
 

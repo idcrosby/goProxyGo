@@ -6,10 +6,20 @@ import (
 	"fmt"
 	"io/ioutil"
 	"github.com/idcrosby/web-tools"
+	"log"
 	"net/http"
 	"net/url"
+	"os"
 	"strings"
+	"time"
 )
+
+var InfoLog *log.Logger
+
+func init() {
+		// init loggers
+	InfoLog = log.New(os.Stdout, "INFO: ", log.Ldate|log.Ltime)
+}
 
 func GoGet(url string) ([]byte, error) {
 	res, err := http.Get(url)
@@ -28,7 +38,21 @@ func BuildRequest(url *url.URL, method string, body []byte, headers http.Header)
 }
 
 func ExecuteRequest(request *http.Request) (resp *http.Response, err error) {
+	InfoLog.Println("Sending Request " + request.URL.String())
 	return http.DefaultClient.Do(request)
+}
+
+func Assault(request *http.Request, threads int, duration int) bool {
+	start := time.Now().Unix()
+	now := start;
+	// TODO Log data
+	for now < (start + int64(duration)) {
+		for i := 0; i < threads; i++ {
+			go ExecuteRequest(request)
+		}
+		now = time.Now().Unix()
+	}
+	return true
 }
 
 func GoGetAndFilter(url string, filter []string, pretty bool) []byte {

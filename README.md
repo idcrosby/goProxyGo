@@ -11,4 +11,9 @@ Simple Proxy written in Go
 - Request and Response modification hooks
 - Header injection/stripping
 - Query parameter modification
+- Send multiple requests (load testing)
+- Add Expected Response parameters
+	- becomes testing tool
+	- test suites, etc..
+	- combine with JSON compare, etc
 
