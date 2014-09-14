@@ -34,8 +34,8 @@ func TestHateoasExpand(t *testing.T) {
 
 func TestAssault(t *testing.T) {
 	req, _ := http.NewRequest("GET",  "http://api.icndb.com/jokes/15", nil)
-	if !Assault(req, 5, 5) {
-		t.Errorf("Assault(http://api.icndb.com/jokes/15, 5, 5) = false")
+	if !Assault(req, 2, 3) {
+		t.Errorf("Assault(http://api.icndb.com/jokes/15, 2, 3) = false")
 	}
 }
 

@@ -24,6 +24,9 @@ func init() {
 func GoGet(url string) ([]byte, error) {
 	res, err := http.Get(url)
 	// check(err)
+	if err != nil {
+		return nil, err
+	}
 	defer res.Body.Close()
 	body, err := ioutil.ReadAll(res.Body)
 	// check(err)
@@ -45,12 +48,24 @@ func ExecuteRequest(request *http.Request) (resp *http.Response, err error) {
 func Assault(request *http.Request, threads int, duration int) bool {
 	start := time.Now().Unix()
 	now := start;
+	errors := make(chan error)
 	// TODO Log data
 	for now < (start + int64(duration)) {
 		for i := 0; i < threads; i++ {
-			go ExecuteRequest(request)
+			// go ExecuteRequest(request)
+			go func() {
+				_, err := ExecuteRequest(request)
+				errors <- err
+			}()
 		}
 		now = time.Now().Unix()
+	}
+	// Check if any errors in channel
+	for el := range errors {
+		if el != nil {
+			InfoLog.Println(el.Error())
+			return false
+		}
 	}
 	return true
 }
