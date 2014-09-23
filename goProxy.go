@@ -17,11 +17,18 @@ import (
 var InfoLog *log.Logger
 
 func init() {
-		// init loggers
+	// init loggers
 	InfoLog = log.New(os.Stdout, "INFO: ", log.Ldate|log.Ltime)
 }
 
-func GoGet(url string) ([]byte, error) {
+type GoProxy struct {
+	// todo implement...
+}
+
+var DefaultGoProxy = &GoProxy{}
+
+
+func (p *GoProxy) GoGet(url string) ([]byte, error) {
 	res, err := http.Get(url)
 	// check(err)
 	if err != nil {
@@ -33,19 +40,23 @@ func GoGet(url string) ([]byte, error) {
 	return body, err
 }
 
-func BuildRequest(url *url.URL, method string, body []byte, headers http.Header) *http.Request {
+func (p *GoProxy) BuildRequest(url *url.URL, method string, body []byte, headers http.Header) *http.Request {
 	req, err := http.NewRequest(method, url.String(), bytes.NewReader(body))
 	check(err)
 	req.Header = headers
 	return req
 }
 
-func ExecuteRequest(request *http.Request) (resp *http.Response, err error) {
+func (p *GoProxy) PreviewRequest(request *http.Request) {
+	// request.Write()
+}
+
+func (p *GoProxy) ExecuteRequest(request *http.Request) (resp *http.Response, err error) {
 	InfoLog.Println("Sending Request " + request.URL.String())
 	return http.DefaultClient.Do(request)
 }
 
-func Assault(request *http.Request, threads int, duration int) bool {
+func (p *GoProxy) Assault(request *http.Request, threads int, duration int) bool {
 	start := time.Now().Unix()
 	now := start;
 	errors := make(chan error)
@@ -54,7 +65,7 @@ func Assault(request *http.Request, threads int, duration int) bool {
 		for i := 0; i < threads; i++ {
 			// go ExecuteRequest(request)
 			go func() {
-				_, err := ExecuteRequest(request)
+				_, err := p.ExecuteRequest(request)
 				errors <- err
 			}()
 		}
@@ -70,9 +81,9 @@ func Assault(request *http.Request, threads int, duration int) bool {
 	return true
 }
 
-func GoGetAndFilter(url string, filter []string, pretty bool) []byte {
+func (p *GoProxy) GoGetAndFilter(url string, filter []string, pretty bool) []byte {
 
-	body, err := GoGet(url)
+	body, err := p.GoGet(url)
 	check(err)
 	buf, err1 := myTools.JsonPositiveFilter(body, filter, pretty)
 	check(err1)
@@ -80,7 +91,7 @@ func GoGetAndFilter(url string, filter []string, pretty bool) []byte {
 	return buf
 }
 
-func HateoasExpand(body []byte, expand []string) (buf []byte, err error) {
+func (p *GoProxy) HateoasExpand(body []byte, expand []string) (buf []byte, err error) {
  	var f interface{}
 	err = json.Unmarshal(body, &f)
 	if err != nil {
@@ -130,7 +141,7 @@ func expandField(baseMap map[string]interface{}, el string) {
 		// for initial implementation, only handle basic `href` field
 		href := subMap["href"]
 		// TODO this is base 64 encoding the response for some reason??
-		baseMap[el], _ = GoGet(href.(string))
+		baseMap[el], _ = DefaultGoProxy.GoGet(href.(string))
 	}
 }
 

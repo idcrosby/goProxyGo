@@ -16,4 +16,5 @@ Simple Proxy written in Go
 	- becomes testing tool
 	- test suites, etc..
 	- combine with JSON compare, etc
+- Implement custom Client
 
