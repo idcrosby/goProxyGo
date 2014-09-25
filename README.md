@@ -17,4 +17,5 @@ Simple Proxy written in Go
 	- test suites, etc..
 	- combine with JSON compare, etc
 - Implement custom Client
-
+- Add pre and post 'Modifiers'
+	- encrypt, filter, transform, verify/validate type

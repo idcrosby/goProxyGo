@@ -1,9 +1,9 @@
 package goProxy
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"github.com/idcrosby/web-tools"
 	"log"
@@ -25,6 +25,10 @@ type GoProxy struct {
 	// todo implement...
 }
 
+type RequestModifier interface {
+	Modify(http.Request)
+}
+
 var DefaultGoProxy = &GoProxy{}
 
 
@@ -40,8 +44,8 @@ func (p *GoProxy) GoGet(url string) ([]byte, error) {
 	return body, err
 }
 
-func (p *GoProxy) BuildRequest(url *url.URL, method string, body []byte, headers http.Header) *http.Request {
-	req, err := http.NewRequest(method, url.String(), bytes.NewReader(body))
+func (p *GoProxy) BuildRequest(url *url.URL, method string, body io.Reader, headers http.Header) *http.Request {
+	req, err := http.NewRequest(method, url.String(), body)
 	check(err)
 	req.Header = headers
 	return req
